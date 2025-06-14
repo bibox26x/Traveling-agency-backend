@@ -1,0 +1,103 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String
+  name          String
+  role          String    @default("user")
+  bookings      Booking[]
+  payments      Payment[]
+  createdTrips  Trip[]    @relation("CreatedTrips")
+  createdAt     DateTime  @default(now())
+}
+
+model Destination {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  imageUrl    String
+  country     String
+  trips       Trip[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Trip {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  location    String
+  imageUrl    String
+  startDate   DateTime
+  price       Float
+  duration    Int
+  destinationId Int?
+  destination  Destination? @relation(fields: [destinationId], references: [id])
+  createdById Int
+  createdBy   User      @relation("CreatedTrips", fields: [createdById], references: [id])
+  bookings    Booking[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([createdById])
+  @@index([destinationId])
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  refunded
+}
+
+model Booking {
+  id          Int       @id @default(autoincrement())
+  tripId      Int
+  userId      Int
+  guests      Int
+  totalPrice  Float
+  status      BookingStatus @default(pending)
+  paymentStatus PaymentStatus @default(pending)
+  specialRequirements String?
+  bookingDate DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  trip        Trip      @relation(fields: [tripId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  payments    Payment[]
+
+  @@index([tripId])
+  @@index([userId])
+}
+
+model Payment {
+  id            Int       @id @default(autoincrement())
+  bookingId     Int
+  userId        Int
+  amount        Float
+  paymentMethod String    // 'cash' or 'bank_transfer'
+  proofImage    String?
+  status        String    // 'pending', 'confirmed', 'rejected'
+  adminNote     String?
+  confirmedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  booking       Booking   @relation(fields: [bookingId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@index([bookingId])
+  @@index([userId])
+}
