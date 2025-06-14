@@ -1,4 +1,8 @@
-export type PaymentStatus = 'pending' | 'paid' | 'refunded';
+export enum PaymentStatus {
+  PENDING = 'pending',
+  PAID = 'paid',
+  REFUNDED = 'refunded'
+}
 
 export interface Trip {
   id: number;
@@ -6,12 +10,9 @@ export interface Trip {
   price: number;
   description: string;
   startDate: Date;
-  endDate: Date;
   location: string;
   imageUrl: string;
-  capacity: number;
-  currentParticipants: number;
-  difficultyLevel: string;
+  duration: number;
   destinationId: number | null;
   createdById: number;
   createdAt: Date;

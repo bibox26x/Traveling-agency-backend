@@ -63,7 +63,6 @@ async function main() {
         location: destination.name,
         imageUrl: `https://picsum.photos/800/600?${destination.name.toLowerCase()}`,
         startDate,
-        endDate,
         price: Math.floor(Math.random() * 2000) + 1000,
         capacity: Math.floor(Math.random() * 15) + 5,
         currentParticipants: 0,

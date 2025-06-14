@@ -26,9 +26,13 @@ export interface BookingResponse {
     description: string;
     location: string;
     startDate: Date;
-    endDate: Date;
     price: number;
     imageUrl: string;
+    duration: number;
+    destinationId: number | null;
+    createdById: number;
+    createdAt: Date;
+    updatedAt: Date;
   };
   user?: {
     id: number;
