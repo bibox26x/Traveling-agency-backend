@@ -7,8 +7,14 @@ import bookingRoutes from './routes/booking';
 import paymentRoutes from './routes/payment';
 import adminRoutes from './routes/admin';
 import destinationRoutes from './routes/destination';
+import cors from 'cors';
 
 const app = express();
+
+// CORS middleware (allow all origins)
+app.use(cors());
+// Global OPTIONS handler for CORS preflight
+app.options('*', cors());
 
 // Middleware
 app.use(cookieParser());
