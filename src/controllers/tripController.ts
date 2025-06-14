@@ -62,7 +62,8 @@ export const createTrip = async (req: Request, res: Response) => {
       startDate,
       duration,
       price,
-      createdById
+      createdById,
+      destinationId
     } = req.body;
 
     // Validate all required fields
@@ -106,6 +107,15 @@ export const createTrip = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid createdById format' });
     }
 
+    // Validate destinationId if provided
+    let parsedDestinationId = null;
+    if (destinationId) {
+      parsedDestinationId = parseInt(destinationId);
+      if (isNaN(parsedDestinationId)) {
+        return res.status(400).json({ error: 'Invalid destination ID format' });
+      }
+    }
+
     // Parse dates and numbers
     const tripData = {
       title: title.trim(),
@@ -115,16 +125,14 @@ export const createTrip = async (req: Request, res: Response) => {
       startDate: parsedStartDate,
       duration: parseInt(duration),
       price: parseFloat(price),
-      createdById: parseInt(createdById)
+      createdById: parseInt(createdById),
+      destinationId: parsedDestinationId
     };
 
     const trip = await tripService.createTrip(tripData);
     res.status(201).json(addEndDateToTrip(trip));
   } catch (error) {
-    console.error('Error in createTrip:', error);
-    if (error instanceof Error && error.message === 'A trip with this title already exists') {
-      return res.status(409).json({ error: error.message });
-    }
+    logger.error('Create trip error:', error);
     res.status(500).json({ error: 'Failed to create trip' });
   }
 };
@@ -137,6 +145,7 @@ interface UpdateTripFields {
   startDate?: Date;
   duration?: number;
   price?: number;
+  destinationId?: number | null;
 }
 
 export const updateTrip = async (req: Request, res: Response) => {
@@ -149,7 +158,7 @@ export const updateTrip = async (req: Request, res: Response) => {
     const updateData: UpdateTripFields = {};
     const fields: (keyof UpdateTripFields)[] = [
       'title', 'description', 'location', 'imageUrl', 'startDate',
-      'duration', 'price'
+      'duration', 'price', 'destinationId'
     ];
 
     fields.forEach(field => {
@@ -172,6 +181,16 @@ export const updateTrip = async (req: Request, res: Response) => {
             throw new Error('Duration must be a positive number');
           }
           updateData[field] = parsedDuration;
+        } else if (field === 'destinationId') {
+          if (req.body[field] === null) {
+            updateData[field] = null;
+          } else {
+            const parsedDestinationId = parseInt(req.body[field]);
+            if (isNaN(parsedDestinationId)) {
+              throw new Error('Invalid destination ID format');
+            }
+            updateData[field] = parsedDestinationId;
+          }
         } else {
           updateData[field] = req.body[field].trim();
         }
@@ -185,16 +204,7 @@ export const updateTrip = async (req: Request, res: Response) => {
 
     res.json(addEndDateToTrip(trip));
   } catch (error) {
-    console.error('Error in updateTrip:', error);
-    if (error instanceof Error) {
-      if (error.message === 'Trip not found') {
-        return res.status(404).json({ error: error.message });
-      } else if (error.message === 'A trip with this title already exists') {
-        return res.status(409).json({ error: error.message });
-      } else if (error.message.includes('Invalid')) {
-        return res.status(400).json({ error: error.message });
-      }
-    }
+    logger.error('Update trip error:', error);
     res.status(500).json({ error: 'Failed to update trip' });
   }
 };
