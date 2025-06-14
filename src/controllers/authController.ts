@@ -10,7 +10,7 @@ import { CookieOptions } from 'express';
 const REFRESH_TOKEN_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  sameSite: 'none',
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   path: '/'
 };

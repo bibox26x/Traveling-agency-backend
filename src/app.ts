@@ -11,10 +11,17 @@ import cors from 'cors';
 
 const app = express();
 
-// CORS middleware (allow all origins)
-app.use(cors());
-// Global OPTIONS handler for CORS preflight
-app.options('*', cors());
+// CORS configuration
+const corsOptions = {
+  origin: true, // Allow any origin
+  credentials: true, // Allow credentials (cookies, authorization headers)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization'],
+};
+
+// Apply CORS middleware with options
+app.use(cors(corsOptions));
 
 // Middleware
 app.use(cookieParser());
