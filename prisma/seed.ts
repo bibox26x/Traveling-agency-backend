@@ -64,9 +64,7 @@ async function main() {
         imageUrl: `https://picsum.photos/800/600?${destination.name.toLowerCase()}`,
         startDate,
         price: Math.floor(Math.random() * 2000) + 1000,
-        capacity: Math.floor(Math.random() * 15) + 5,
-        currentParticipants: 0,
-        difficultyLevel: ['easy', 'moderate', 'challenging'][Math.floor(Math.random() * 3)],
+        duration: Math.floor(Math.random() * 14) + 3,
         destinationId: destination.id,
         createdById: 1 // Assuming admin user has ID 1
       }

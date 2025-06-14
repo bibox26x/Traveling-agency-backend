@@ -1,7 +1,12 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { body } from 'express-validator';
 import { authenticateJWT } from '../middleware/auth';
-import { createBooking, getUserBookings, cancelBooking } from '../controllers/bookingController';
+import { AuthenticatedRequest } from '../types/auth';
+import { createBooking as createBookingRaw, getUserBookings as getUserBookingsRaw, cancelBooking as cancelBookingRaw } from '../controllers/bookingController';
+
+const createBooking: RequestHandler = (req, res) => createBookingRaw(req as AuthenticatedRequest, res);
+const getUserBookings: RequestHandler = (req, res) => getUserBookingsRaw(req as AuthenticatedRequest, res);
+const cancelBooking: RequestHandler = (req, res) => cancelBookingRaw(req as AuthenticatedRequest, res);
 
 const router = Router();
 
