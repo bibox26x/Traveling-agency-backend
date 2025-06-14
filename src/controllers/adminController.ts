@@ -103,7 +103,7 @@ export const updateBookingStatus = async (req: AuthenticatedRequest, res: Respon
 
 export const updatePaymentStatus = async (req: AuthenticatedRequest, res: Response) => {
   const bookingId = Number(req.params.id);
-  const { paymentStatus } = req.body;
+  const { status } = req.body;
 
   try {
     if (isNaN(bookingId)) {
@@ -111,7 +111,7 @@ export const updatePaymentStatus = async (req: AuthenticatedRequest, res: Respon
     }
 
     // Validate payment status
-    if (!VALID_PAYMENT_STATUSES.includes(paymentStatus)) {
+    if (!VALID_PAYMENT_STATUSES.includes(status)) {
       return res.status(400).json({ error: 'Invalid payment status' });
     }
 
@@ -136,7 +136,7 @@ export const updatePaymentStatus = async (req: AuthenticatedRequest, res: Respon
 
     const booking = await prisma.booking.update({
       where: { id: bookingId },
-      data: { paymentStatus },
+      data: { paymentStatus: status },
       include: {
         trip: true,
         user: {
@@ -151,7 +151,7 @@ export const updatePaymentStatus = async (req: AuthenticatedRequest, res: Respon
 
     logger.business('payment_status_updated', {
       bookingId,
-      newStatus: paymentStatus,
+      newStatus: status,
       adminId: req.user.userId,
       requestId: req.headers['x-request-id']
     });
@@ -161,7 +161,7 @@ export const updatePaymentStatus = async (req: AuthenticatedRequest, res: Respon
     logger.error('Error updating payment status:', {
       error,
       bookingId,
-      paymentStatus,
+      status,
       adminId: req.user.userId
     });
     res.status(500).json({ error: 'Failed to update payment status' });
